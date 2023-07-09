@@ -1,37 +1,25 @@
-const http = require("http");
+const express = require("express");
 const fs = require("fs");
 
-//Third-Party Modules
-const httpStatus = require("http-status-codes");
+const app = express();
+const port = 3000;
 
-const routeMap = {
-  "/": "index.html",
-  "/about": "about.html",
-  "/contact-me": "contact-me.html",
-};
-
-const port = 8000;
-
-const server = http.createServer((request, response) => {
-  response.setHeader("Content-Type", "text/plain");
-  response.writeHead(httpStatus.StatusCodes.OK, {
-    "Content-Type": "text/html",
-  });
-
-  if (routeMap[request.url]) {
-    fs.readFile(routeMap[request.url], (err, data) => {
-      response.statusCode = 200;
-      response.write(data);
-      response.end();
-    });
-  } else {
-    fs.readFile("404.html", (err, data) => {
-      console.log(err);
-      response.statusCode = 404;
-      response.end(data);
-    });
-  }
+app.get("/", (req, res) => {
+  res.sendFile(__dirname + "/index.html");
 });
 
-server.listen(port);
-console.log(`The server is listening on port: ${port}`);
+app.get("/about", (req, res) => {
+  res.sendFile(__dirname + "/about.html");
+});
+
+app.get("/contact", (req, res) => {
+  res.sendFile(__dirname + "/contact-me.html");
+});
+
+app.use((req, res, next) => {
+  res.status(404).sendFile(__dirname + "/404.html");
+});
+
+app.listen(port, () => {
+  console.log(`Example app listening on port ${port}!`);
+});
